@@ -1,52 +1,71 @@
 {
-  "name": "eslint-plugin-sort-properties",
-  "version": "1.1.13",
-  "description": "ESLint rules for sorting properties of object expressions, object destructures, and type literals interfaces for TypeScript by their keys.",
+  "name": "eslint-plugin-sort-properties-angular",
+  "version": "1.0.0",
+  "description": "Angular-aware fork of eslint-plugin-sort-properties: sorts object, destructuring, type literal and interface keys while leaving Angular decorator metadata to @angular-eslint/sort-keys-in-type-decorator.",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "rules/",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "docgen": "DOCGEN=true eslint-doc-generator",
-    "run:benchmark": "node benchmarks/run.js --max-old-heap-size=8192 | prettier --no-config --stdin-filepath benchmarks/result.md > benchmarks/result.md"
+    "run:benchmark": "node benchmarks/run.js --max-old-heap-size=8192 | prettier --no-config --stdin-filepath benchmarks/result.md > benchmarks/result.md",
+    "test": "node --test \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/haenah/eslint-plugin-sort-properties"
+    "url": "git+https://github.com/ThisIsIvan/eslint-plugin-sort-properties-angular.git"
+  },
+  "homepage": "https://github.com/ThisIsIvan/eslint-plugin-sort-properties-angular#readme",
+  "bugs": {
+    "url": "https://github.com/ThisIsIvan/eslint-plugin-sort-properties-angular/issues"
   },
   "dependencies": {
     "natural-compare": "^1.4.0"
   },
   "devDependencies": {
+    "@angular-eslint/eslint-plugin": "^22.6.0",
+    "@eslint/js": "^10.0.1",
     "@types/json-schema": "^7.0.15",
+    "@typescript-eslint/parser": "^8.72.1",
+    "@typescript-eslint/utils": "^8.72",
+    "eslint": "^10.14.0",
     "eslint-doc-generator": "^2.0.2",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "globals": "^15.14.0",
-    "prettier": "^3.4.2"
+    "prettier": "^3.4.2",
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
-    "eslint": "^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9"
+    "eslint": "^9.22.0 || ^10"
+  },
+  "engines": {
+    "node": ">=18.18"
   },
   "keywords": [
     "eslint",
     "eslint-plugin",
+    "angular",
+    "angular-eslint",
+    "decorator",
     "sort",
     "object",
     "keys",
     "property",
     "type",
     "interface",
-    "enum",
     "typescript",
-    "sort-object",
     "sort-keys",
-    "sort-property",
     "sort-properties",
-    "sort-type",
-    "sort-interface",
-    "sort-enum",
-    "sort-typescript",
-    "sort-javascript"
+    "sort-keys-in-type-decorator"
   ],
-  "author": "haenah",
+  "author": "Ivan Taraca",
+  "contributors": [
+    "haenah (original eslint-plugin-sort-properties)"
+  ],
   "license": "MIT",
   "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

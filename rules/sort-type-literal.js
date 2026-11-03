@@ -1,5 +1,6 @@
 const baseMessage = require("./constants/base-message");
 const { baseSchema } = require("./constants/base-option");
+const { ruleDocUrl } = require("./constants/meta");
 const { createCheck } = require("./utils/check");
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -10,7 +11,7 @@ module.exports = {
       category: "Stylistic Issues",
       description: "Enforce properties in type literals to be sorted.",
       recommended: true,
-      url: "https://github.com/haenah/eslint-plugin-sort-properties/blob/v1.1.13/docs/rules/sort-type-literal.md",
+      url: ruleDocUrl("sort-type-literal"),
     },
     fixable: "code",
     hasSuggestions: true,

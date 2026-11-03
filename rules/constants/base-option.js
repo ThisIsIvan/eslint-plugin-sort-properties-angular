@@ -32,7 +32,6 @@ const baseSchema = {
       default: "leading",
       description: "Position of comments to consider as part of the property.",
       enum: ["leading", "trailing"],
-      required: false,
     },
     minKeys: {
       default: 2,

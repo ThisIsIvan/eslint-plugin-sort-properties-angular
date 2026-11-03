@@ -1,4 +1,4 @@
-# sort-properties/sort-object-destructing
+# sort-properties-angular/sort-object-destructing
 
 ⚠️ This rule _warns_ in the following configs: 🌐 `all`, ![JavaScript](https://img.shields.io/badge/-JS-F7DF1E?style=flat-square) `js`.
 

@@ -1,5 +1,6 @@
 const baseMessage = require("./constants/base-message");
 const { baseSchema } = require("./constants/base-option");
+const { ruleDocUrl } = require("./constants/meta");
 const { createCheck } = require("./utils/check");
 
 const schema = {
@@ -18,7 +19,7 @@ module.exports = {
       category: "Stylistic Issues",
       description: "Enforce properties in object destructuring to be sorted.",
       recommended: true,
-      url: "https://github.com/haenah/eslint-plugin-sort-properties/blob/v1.1.13/docs/rules/sort-object-destructing.md",
+      url: ruleDocUrl("sort-object-destructing"),
     },
     fixable: "code",
     hasSuggestions: true,

@@ -1,4 +1,4 @@
-const packageVersion = require("./package.json").version;
+const { ruleDocUrl } = require("./rules/constants/meta");
 
 /** @type {import('eslint-doc-generator').GenerateOptions} */
 module.exports = {
@@ -13,5 +13,5 @@ module.exports = {
     ],
   ],
   ruleDocTitleFormat: "prefix-name",
-  urlRuleDoc: `https://github.com/haenah/eslint-plugin-sort-properties/blob/v${packageVersion}/docs/rules/{name}.md`,
+  urlRuleDoc: ruleDocUrl("{name}"),
 };

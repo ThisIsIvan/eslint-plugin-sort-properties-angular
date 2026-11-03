@@ -1,4 +1,4 @@
-# sort-properties/sort-type-literal
+# sort-properties-angular/sort-type-literal
 
 ⚠️ This rule _warns_ in the following configs: 🌐 `all`, ![TypeScript](https://img.shields.io/badge/-TS-007ACC?style=flat-square) `ts`.
 
