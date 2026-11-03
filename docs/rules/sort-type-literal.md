@@ -50,19 +50,28 @@ type Foo = {
 
 ### Option Examples
 
-```json
-{
-  "sort-properties/sort-type-literal": [
-    "error",
-    {
-      "order": "asc",
-      "caseSensitive": false,
-      "natural": false,
-      "allowLineSeparatedGroups": false,
-      "ignoreComputedKeys": true,
-      "minKeys": 3,
-      "functionPriority": "higher"
-    }
-  ]
-}
+```js
+// eslint.config.mjs
+import { defineConfig } from "eslint/config";
+import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
+
+export default defineConfig({
+  files: ["**/*.ts"],
+  languageOptions: { parser: tseslint.parser },
+  plugins: { "sort-properties-angular": sortProperties },
+  rules: {
+    "sort-properties-angular/sort-type-literal": [
+      "error",
+      {
+        allowLineSeparatedGroups: false,
+        caseSensitive: false,
+        functionOrder: "higher",
+        minKeys: 3,
+        natural: false,
+        order: "asc",
+      },
+    ],
+  },
+});
 ```

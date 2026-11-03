@@ -60,34 +60,52 @@ export class X {}
 
 <!-- begin auto-generated rule options list -->
 
-| Name                       | Description                                                                                                                                                                                                                                                | Type     | Choices                    | Default                                                      |
-| :------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- | :------------------------- | :----------------------------------------------------------- |
-| `allowLineSeparatedGroups` | If true, properties are separated independently by line breaks. Works same as [eslint sort-keys rule](https://eslint.org/docs/latest/rules/sort-keys#rule-details).                                                                                        | Boolean  |                            | `true`                                                       |
-| `caseSensitive`            | Whether the comparison is case sensitive.                                                                                                                                                                                                                  | Boolean  |                            | `true`                                                       |
-| `functionOrder`            | The priority of properties which values are either method or arrow function. For example, if order is 'asc' and functionOrder is 'higher', function properties will be placed at the end.                                                                  |          | `higher`, `lower`, `equal` | `higher`                                                     |
-| `ignoreAngularDecorators`  | Names of Angular class decorators whose metadata object is skipped so that `@angular-eslint/sort-keys-in-type-decorator` can sort it. Objects nested inside the metadata are still checked. Set to `[]` to sort decorator metadata alphabetically as well. | String[] |                            | [`Component`, `Directive`, `Injectable`, `NgModule`, `Pipe`] |
-| `includeComments`          | Position of comments to consider as part of the property.                                                                                                                                                                                                  |          | `leading`, `trailing`      | `leading`                                                    |
-| `minKeys`                  | Minimum number of keys to check order.                                                                                                                                                                                                                     | Integer  |                            | `2`                                                          |
-| `natural`                  | Whether the comparison is using a natural order. See [natural-compare](https://www.npmjs.com/package/natural-compare)                                                                                                                                      | Boolean  |                            | `true`                                                       |
-| `order`                    | The order of properties.                                                                                                                                                                                                                                   | String   | `asc`, `desc`              | `asc`                                                        |
+| Name                       | Description                                                                                                                                                                                                                                                                                        | Type    | Choices                    | Default   |
+| :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------ | :------------------------- | :-------- |
+| `allowLineSeparatedGroups` | If true, properties are separated independently by line breaks. Works same as [eslint sort-keys rule](https://eslint.org/docs/latest/rules/sort-keys#rule-details).                                                                                                                                | Boolean |                            | `true`    |
+| `caseSensitive`            | Whether the comparison is case sensitive.                                                                                                                                                                                                                                                          | Boolean |                            | `true`    |
+| `functionOrder`            | The priority of properties which values are either method or arrow function. For example, if order is 'asc' and functionOrder is 'higher', function properties will be placed at the end.                                                                                                          |         | `higher`, `lower`, `equal` | `higher`  |
+| `ignoreAngularDecorators`  | Skip the metadata object of Angular class decorators (`@Component`, `@Directive`, `@Injectable`, `@NgModule`, `@Pipe`) so that `@angular-eslint/sort-keys-in-type-decorator` can sort it. Objects nested inside the metadata are still checked. Set to `false` to sort decorator metadata as well. | Boolean |                            | `true`    |
+| `includeComments`          | Position of comments to consider as part of the property.                                                                                                                                                                                                                                          |         | `leading`, `trailing`      | `leading` |
+| `minKeys`                  | Minimum number of keys to check order.                                                                                                                                                                                                                                                             | Integer |                            | `2`       |
+| `natural`                  | Whether the comparison is using a natural order. See [natural-compare](https://www.npmjs.com/package/natural-compare)                                                                                                                                                                              | Boolean |                            | `true`    |
+| `order`                    | The order of properties.                                                                                                                                                                                                                                                                           | String  | `asc`, `desc`              | `asc`     |
 
 <!-- end auto-generated rule options list -->
 
 ### Option Examples
 
-```json
-{
-  "sort-properties/sort-interface": [
-    "error",
-    {
-      "order": "desc",
-      "caseSensitive": false,
-      "natural": false,
-      "allowLineSeparatedGroups": false,
-      "ignoreComputedKeys": true,
-      "minKeys": 3,
-      "functionPriority": "lower"
-    }
-  ]
-}
+```js
+// eslint.config.mjs
+import { defineConfig } from "eslint/config";
+import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
+
+export default defineConfig(
+  {
+    // TypeScript parser for .ts files (decorators, type annotations).
+    files: ["**/*.ts"],
+    languageOptions: { parser: tseslint.parser },
+  },
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    plugins: { "sort-properties-angular": sortProperties },
+    rules: {
+      "sort-properties-angular/sort-object-expression": [
+        "error",
+        {
+          allowLineSeparatedGroups: false,
+          caseSensitive: false,
+          functionOrder: "lower",
+          // Default. Leaves Angular decorator metadata to @angular-eslint/sort-keys-in-type-decorator.
+          // Set to false only if you do not use that rule.
+          ignoreAngularDecorators: true,
+          minKeys: 3,
+          natural: false,
+          order: "desc",
+        },
+      ],
+    },
+  },
+);
 ```

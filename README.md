@@ -31,14 +31,14 @@ Only the first-argument object of `@Component`, `@Directive`, `@Injectable`, `@N
 | Decorators on class expressions (`const A = @Component({...}) class {}`) | this plugin (the Angular rule ignores them) |
 | Plain calls (`Component({...})`)                                   | this plugin                   |
 
-The list of skipped decorators is configurable with the `ignoreAngularDecorators` option of [`sort-object-expression`](docs/rules/sort-object-expression.md). If you configure `sort-keys-in-type-decorator` without one of the decorators, remove it from `ignoreAngularDecorators` too, otherwise that metadata is unchecked.
+Skipping is controlled by the boolean `ignoreAngularDecorators` option of [`sort-object-expression`](docs/rules/sort-object-expression.md) (default `true`). Set it to `false` if you do not use `sort-keys-in-type-decorator` and want decorator metadata sorted alphabetically too.
 
 ## Other changes compared to the original
 
 - Rules no longer mutate AST nodes (the original widened `range`/`loc` of property nodes to include comments and stored cache fields on them). This could leak into other rules' fixers and is rejected by ESLint 10's `RuleTester`.
 - Fixed an invalid JSON schema (`required: false` on `includeComments`).
 - Added a test suite (`pnpm test`).
-- Supports ESLint 9 and 10 (flat config).
+- Supports ESLint 9.22+ and 10 (flat config).
 
 ## Rules
 
@@ -63,62 +63,98 @@ The list of skipped decorators is configurable with the `ignoreAngularDecorators
 ## Installation
 
 ```bash
+npm install --save-dev eslint eslint-plugin-sort-properties-angular
+# or
 pnpm add -D eslint eslint-plugin-sort-properties-angular
 ```
+
+Requires ESLint 9.22 or newer (including 10) with flat config (`eslint.config.js` / `eslint.config.mjs`). The legacy `.eslintrc` format is not supported.
 
 ## Available configurations
 
 <!-- begin auto-generated configs list -->
 
-|                                                                          | Name  | Description                                                                                |
-| :----------------------------------------------------------------------- | :---- | :----------------------------------------------------------------------------------------- |
-| 🌐                                                                       | `all` | Apply all rules in the `sort-properties-angular` plugin. Use `flat/all` in eslint>=9       |
-| ![JavaScript](https://img.shields.io/badge/-JS-F7DF1E?style=flat-square) | `js`  | Apply JavaScript rules in the `sort-properties-angular` plugin. Use `flat/js` in eslint>=9 |
-| ![TypeScript](https://img.shields.io/badge/-TS-007ACC?style=flat-square) | `ts`  | Apply TypeScript rules in the `sort-properties-angular` plugin. Use `flat/ts` in eslint>=9 |
+|                                                                          | Name  | Description                                                         |
+| :----------------------------------------------------------------------- | :---- | :------------------------------------------------------------------ |
+| 🌐                                                                       | `all` | Enable all rules of the `sort-properties-angular` plugin.           |
+| ![JavaScript](https://img.shields.io/badge/-JS-F7DF1E?style=flat-square) | `js`  | Enable the JavaScript rules (object expressions and destructuring). |
+| ![TypeScript](https://img.shields.io/badge/-TS-007ACC?style=flat-square) | `ts`  | Enable the TypeScript rules (interfaces and type literals).         |
 
 <!-- end auto-generated configs list -->
 
-## Configuration (`eslint.config.js`)
+## Configuration
 
 > **Note**\
-> TypeScript rules (`sort-interface`, `sort-type-literal`) and decorators need `@typescript-eslint/parser` (e.g. via `typescript-eslint`).
+> Decorators and the TypeScript rules (`sort-interface`, `sort-type-literal`) need the TypeScript parser. In an Angular project it is already set up by [`typescript-eslint`](https://typescript-eslint.io) / [`angular-eslint`](https://github.com/angular-eslint/angular-eslint).
+
+### Angular project (recommended)
+
+Enable the plugin's `all` config together with `@angular-eslint/sort-keys-in-type-decorator`:
 
 ```js
+// eslint.config.mjs
+import angular from "angular-eslint";
+import { defineConfig } from "eslint/config";
 import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
 
-export default [
-  // ...
-  sortProperties.configs["flat/all"],
-  {
-    rules: {
-      "@angular-eslint/sort-keys-in-type-decorator": "error",
-    },
+export default defineConfig({
+  files: ["**/*.ts"],
+  extends: [tseslint.configs.recommended, angular.configs.tsRecommended, sortProperties.configs.all],
+  rules: {
+    "@angular-eslint/sort-keys-in-type-decorator": "error",
   },
-];
+});
 ```
 
-or enable specific rules:
+### Enable rules individually
 
 ```js
+// eslint.config.mjs
+import { defineConfig } from "eslint/config";
 import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
 
-export default [
-  {
-    plugins: { "sort-properties-angular": sortProperties },
-    rules: {
-      "sort-properties-angular/sort-interface": "warn",
-      "sort-properties-angular/sort-object-destructing": "warn",
-      "sort-properties-angular/sort-object-expression": [
-        "warn",
-        { ignoreAngularDecorators: ["Component", "Directive", "Injectable", "NgModule", "Pipe"] },
-      ],
-      "sort-properties-angular/sort-type-literal": "warn",
-    },
+export default defineConfig({
+  files: ["**/*.ts"],
+  languageOptions: { parser: tseslint.parser },
+  plugins: { "sort-properties-angular": sortProperties },
+  rules: {
+    "sort-properties-angular/sort-interface": "error",
+    "sort-properties-angular/sort-object-destructing": "error",
+    "sort-properties-angular/sort-object-expression": [
+      "error",
+      {
+        // Default. Use false to sort Angular decorator metadata alphabetically as well.
+        ignoreAngularDecorators: true,
+      },
+    ],
+    "sort-properties-angular/sort-type-literal": "error",
   },
-];
+});
 ```
 
-The plugin key is your choice. Registering it as `"sort-properties"` makes it a drop-in replacement for the original plugin with unchanged rule names.
+### Migrating from `eslint-plugin-sort-properties`
+
+The plugin key is your choice. Register the fork under the old `sort-properties` key and your existing rule names keep working unchanged:
+
+```diff
+-import sortProperties from "eslint-plugin-sort-properties";
++import sortProperties from "eslint-plugin-sort-properties-angular";
+
+ export default defineConfig({
+   plugins: { "sort-properties": sortProperties },
+   rules: {
+     "sort-properties/sort-object-expression": "error",
+     // ...
+   },
+ });
+```
+
+> **Note**\
+> Register the plugin under one key only. Do not combine this with `sortProperties.configs.all` / `js` / `ts`: those register the plugin under `sort-properties-angular` as well, so every rule would run twice (once per key) and report each problem twice. Either keep the old key and enable rules individually as above, or switch to the configs and rename your rule settings to `sort-properties-angular/*`.
+
+`configs.all`, `configs.js` and `configs.ts` are flat configs. `configs["flat/all"]`, `configs["flat/js"]` and `configs["flat/ts"]` remain as aliases.
 
 ## Options
 
@@ -138,7 +174,7 @@ All four rules share most of the options below:
 
 | Name                      | Description                                                                                                                                       | Type     | Default                                                       |
 | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------ | :------- | :------------------------------------------------------------ |
-| `ignoreAngularDecorators` | Angular class decorators whose metadata object is skipped. Objects nested inside the metadata are still checked. `[]` sorts decorator metadata too. | String[] | `["Component", "Directive", "Injectable", "NgModule", "Pipe"]` |
+| `ignoreAngularDecorators` | Skip the metadata object of `@Component`, `@Directive`, `@Injectable`, `@NgModule` and `@Pipe`. Objects nested inside the metadata are still checked. `false` sorts decorator metadata too. | Boolean | `true` |
 
 ## License
 

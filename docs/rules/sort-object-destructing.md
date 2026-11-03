@@ -37,19 +37,33 @@ const { a, b } = obj;
 
 ### Option Examples
 
-```json
-{
-  "sort-properties/sort-interface": [
-    "error",
-    {
-      "order": "desc",
-      "caseSensitive": false,
-      "natural": false,
-      "allowLineSeparatedGroups": false,
-      "ignoreComputedKeys": true,
-      "minKeys": 3,
-      "functionPriority": "higher"
-    }
-  ]
-}
+```js
+// eslint.config.mjs
+import { defineConfig } from "eslint/config";
+import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
+
+export default defineConfig(
+  {
+    // TypeScript parser for .ts files (decorators, type annotations).
+    files: ["**/*.ts"],
+    languageOptions: { parser: tseslint.parser },
+  },
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    plugins: { "sort-properties-angular": sortProperties },
+    rules: {
+      "sort-properties-angular/sort-object-destructing": [
+        "error",
+        {
+          allowLineSeparatedGroups: false,
+          caseSensitive: false,
+          minKeys: 3,
+          natural: false,
+          order: "desc",
+        },
+      ],
+    },
+  },
+);
 ```

@@ -1,38 +1,43 @@
 const { PLUGIN_NAMESPACE: ns, version } = require("./rules/constants/meta");
 
-const allRules = {
-  [`${ns}/sort-interface`]: ["warn"],
-  [`${ns}/sort-object-destructing`]: ["warn"],
-  [`${ns}/sort-object-expression`]: ["warn"],
-  [`${ns}/sort-type-literal`]: ["warn"],
-};
+/** Set by `pnpm docgen` (eslint-doc-generator). */
+const docgen = Boolean(process.env.DOCGEN);
 
 const jsRules = {
-  [`${ns}/sort-object-destructing`]: ["warn"],
-  [`${ns}/sort-object-expression`]: ["warn"],
+  [`${ns}/sort-object-destructing`]: "warn",
+  [`${ns}/sort-object-expression`]: "warn",
 };
 
 const tsRules = {
-  [`${ns}/sort-interface`]: ["warn"],
-  [`${ns}/sort-type-literal`]: ["warn"],
+  [`${ns}/sort-interface`]: "warn",
+  [`${ns}/sort-type-literal`]: "warn",
+};
+
+const allRules = Object.fromEntries(
+  Object.entries({ ...jsRules, ...tsRules }).sort(([a], [b]) =>
+    a.localeCompare(b)
+  )
+);
+
+/** Single source of truth for the bundled configs. */
+const configTable = {
+  all: {
+    description: `Enable all rules of the \`${ns}\` plugin.`,
+    rules: allRules,
+  },
+  js: {
+    description: `Enable the JavaScript rules (object expressions and destructuring).`,
+    rules: jsRules,
+  },
+  ts: {
+    description: `Enable the TypeScript rules (interfaces and type literals).`,
+    rules: tsRules,
+  },
 };
 
 /** @type {import('eslint').ESLint.Plugin} */
-module.exports = {
-  configs: {
-    all: {
-      plugins: [ns],
-      rules: allRules,
-    },
-    js: {
-      plugins: [ns],
-      rules: jsRules,
-    },
-    ts: {
-      plugins: [ns],
-      rules: tsRules,
-    },
-  },
+const plugin = {
+  configs: {},
   meta: { name: `eslint-plugin-${ns}`, version },
   rules: {
     "sort-interface": require("./rules/sort-interface"),
@@ -41,35 +46,22 @@ module.exports = {
     "sort-type-literal": require("./rules/sort-type-literal"),
   },
 };
-if (process?.env?.DOCGEN) {
-  module.exports.configs.all.meta = {
-    docs: {
-      description: `Apply all rules in the \`${ns}\` plugin. Use \`flat/all\` in eslint>=9`,
-    },
-  };
-  module.exports.configs.js.meta = {
-    docs: {
-      description: `Apply JavaScript rules in the \`${ns}\` plugin. Use \`flat/js\` in eslint>=9`,
-    },
-  };
-  module.exports.configs.ts.meta = {
-    docs: {
-      description: `Apply TypeScript rules in the \`${ns}\` plugin. Use \`flat/ts\` in eslint>=9`,
-    },
-  };
+
+/** Flat configs. `flat/*` are kept as aliases for compatibility with the original plugin. */
+for (const [key, { description, rules }] of Object.entries(configTable)) {
+  if (docgen) {
+    // eslint-doc-generator cannot handle the circular plugin reference.
+    plugin.configs[key] = { meta: { docs: { description } }, rules };
+    continue;
+  }
+  // Separate objects per name, so modifying one config does not affect the other.
+  for (const name of [key, `flat/${key}`]) {
+    plugin.configs[name] = {
+      name: `${ns}/${name}`,
+      plugins: { [ns]: plugin },
+      rules: { ...rules },
+    };
+  }
 }
 
-if (!process?.env?.DOCGEN) {
-  module.exports.configs["flat/all"] = {
-    plugins: { [ns]: module.exports },
-    rules: allRules,
-  };
-  module.exports.configs["flat/js"] = {
-    plugins: { [ns]: module.exports },
-    rules: jsRules,
-  };
-  module.exports.configs["flat/ts"] = {
-    plugins: { [ns]: module.exports },
-    rules: tsRules,
-  };
-}
+module.exports = plugin;

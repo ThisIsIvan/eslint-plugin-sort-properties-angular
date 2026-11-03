@@ -50,19 +50,28 @@ interface Foo {
 
 ### Option Examples
 
-```json
-{
-  "sort-properties/sort-interface": [
-    "error",
-    {
-      "order": "desc",
-      "caseSensitive": false,
-      "natural": false,
-      "allowLineSeparatedGroups": false,
-      "ignoreComputedKeys": true,
-      "minKeys": 3,
-      "functionOrder": "equal"
-    }
-  ]
-}
+```js
+// eslint.config.mjs
+import { defineConfig } from "eslint/config";
+import sortProperties from "eslint-plugin-sort-properties-angular";
+import tseslint from "typescript-eslint";
+
+export default defineConfig({
+  files: ["**/*.ts"],
+  languageOptions: { parser: tseslint.parser },
+  plugins: { "sort-properties-angular": sortProperties },
+  rules: {
+    "sort-properties-angular/sort-interface": [
+      "error",
+      {
+        allowLineSeparatedGroups: false,
+        caseSensitive: false,
+        functionOrder: "equal",
+        minKeys: 3,
+        natural: false,
+        order: "desc",
+      },
+    ],
+  },
+});
 ```
